@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Склад товаров</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 20px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Склад товаров</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div>{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <h3>Добавить / обновить товар</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Сохранить</button>
+    </form>
+
+    <h3>Список товаров</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Наименование</th>
+            <th>Цена</th>
+            <th>Остаток</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for p in products %}
+            <tr>
+                <td>{{ p.name }}</td>
+                <td>{{ p.price }}</td>
+                <td>{{ p.stock }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="3">Нет товаров</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
+

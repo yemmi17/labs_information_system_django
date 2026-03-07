@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Поиск клиента</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 40px auto; background: #fff; padding: 20px; border-radius: 8px; }
+        .field-label { font-weight: bold; }
+        .credit-ok { color: green; }
+        .credit-warning { color: red; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Поиск клиента</h2>
+    <form method="get">
+        {{ form.as_p }}
+        <button type="submit">Найти</button>
+    </form>
+
+    {% if client %}
+        <hr>
+        <h3>Информация о клиенте: {{ client.name }}</h3>
+        <p><span class="field-label">Общий счёт покупок:</span> {{ client.total_purchases }}</p>
+        <p><span class="field-label">Текущий счёт клиента:</span> {{ client.current_balance }}</p>
+        <p><span class="field-label">Потолок кредита:</span> {{ client.credit_limit }}</p>
+        {% if client.credit_usage_ratio >= 0.9 %}
+            <p class="credit-warning"><span class="field-label">Текущий долг:</span> {{ client.current_debt }}</p>
+            <p class="credit-warning"><span class="field-label">Остаток кредита:</span> {{ client.credit_remaining }}</p>
+        {% else %}
+            <p class="credit-ok"><span class="field-label">Текущий долг:</span> {{ client.current_debt }}</p>
+            <p><span class="field-label">Остаток кредита:</span> {{ client.credit_remaining }}</p>
+        {% endif %}
+        {% if client.comment %}
+            <p><span class="field-label">Комментарий:</span> {{ client.comment }}</p>
+        {% endif %}
+    {% endif %}
+</div>
+</body>
+</html>
+
