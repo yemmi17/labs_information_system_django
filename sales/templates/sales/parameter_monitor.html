@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>АРМ контроля параметра</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #eef2f7; color: #182230; }
+        .container { max-width: 1100px; margin: 24px auto; background: #fff; padding: 20px; border-radius: 10px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .panel { border: 1px solid #d7deea; border-radius: 8px; padding: 12px; background: #f9fbff; }
+        .status { padding: 10px; border-radius: 6px; margin-bottom: 10px; font-weight: bold; }
+        .warning { background: #fff3cd; border: 1px solid #f3d47a; color: #8a6d3b; }
+        .alarm { background: #ffd9de; border: 1px solid #ef7b8d; color: #8e1026; }
+        label { display: block; margin-bottom: 8px; }
+        input, select { width: 100%; padding: 6px; margin-top: 4px; box-sizing: border-box; }
+        .charts img { max-width: 100%; border: 1px solid #d7deea; border-radius: 8px; margin-top: 10px; background: #fff; }
+        .mono { font-family: "Consolas", monospace; }
+        .muted { color: #5d6b7f; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>АРМ контроля и анализа параметра</h1>
+    <p class="muted">
+        Страница отображает текущее и предыдущие значения, выполняет выборку,
+        строит графики и формирует предупреждения/тревоги.
+    </p>
+
+    {% if warning_triggered %}
+        <div class="status warning">{{ warning_message }}</div>
+    {% endif %}
+    {% if alarm_triggered %}
+        <div class="status alarm">{{ alarm_message }}</div>
+    {% endif %}
+
+    <div class="grid">
+        <div class="panel">
+            <h3>Входные параметры</h3>
+            <form method="post" id="monitor-form">
+                {% csrf_token %}
+                <label>Текущее значение
+                    <input type="number" step="any" name="current_value" required value="{{ current_value|default:'' }}">
+                </label>
+                <label>N1 (количество предыдущих значений, 2..10)
+                    <input type="number" name="history_size" min="2" max="10" value="{{ history_size }}">
+                </label>
+                <label>N2 (порог изменения, %, 5..40)
+                    <input type="number" step="any" name="percent_threshold" min="5" max="40" value="{{ percent_threshold }}">
+                </label>
+                <label>Нижняя допустимая граница
+                    <input type="number" step="any" name="allowed_min" value="{{ allowed_min }}">
+                </label>
+                <label>Верхняя допустимая граница
+                    <input type="number" step="any" name="allowed_max" value="{{ allowed_max }}">
+                </label>
+
+                <label>Тип выборки
+                    <select name="selection_type" id="selection_type">
+                        <option value="gt" {% if selection_type == 'gt' %}selected{% endif %}>Больше границы</option>
+                        <option value="lt" {% if selection_type == 'lt' %}selected{% endif %}>Меньше границы</option>
+                        <option value="multiple" {% if selection_type == 'multiple' %}selected{% endif %}>Кратно значению</option>
+                    </select>
+                </label>
+                <label>Граничное значение (для больше/меньше)
+                    <input type="number" step="any" name="boundary_value" value="{{ boundary_value }}">
+                </label>
+                <label>Кратность (для "кратно")
+                    <input type="number" name="multiple_value" min="1" value="{{ multiple_value }}">
+                </label>
+                <button type="submit">Обновить данные</button>
+            </form>
+        </div>
+
+        <div class="panel">
+            <h3>Числовые данные</h3>
+            <p><strong>Текущее значение:</strong> <span class="mono">{{ current_value|default:"-" }}</span></p>
+            <p><strong>Предыдущие значения:</strong> <span class="mono">{{ previous_values }}</span></p>
+            <p><strong>Текущая группа данных:</strong> <span class="mono">{{ all_values }}</span></p>
+            <p><strong>Выборочные значения:</strong> <span class="mono">{{ selected_values }}</span></p>
+            <p><strong>Среднее выборки:</strong>
+                <span class="mono">
+                    {% if selected_mean is not None %}{{ selected_mean|floatformat:3 }}{% else %}-{% endif %}
+                </span>
+            </p>
+        </div>
+    </div>
+
+    <div class="panel charts" style="margin-top: 14px;">
+        <h3>Графики и диаграмма</h3>
+        {% if chart_all %}
+            <img src="data:image/png;base64,{{ chart_all }}" alt="График текущих данных">
+        {% endif %}
+        {% if chart_selected %}
+            <img src="data:image/png;base64,{{ chart_selected }}" alt="График выборочных данных">
+        {% endif %}
+        {% if chart_bar %}
+            <img src="data:image/png;base64,{{ chart_bar }}" alt="Диаграмма выборочных данных">
+        {% endif %}
+        {% if not chart_all %}
+            <p class="muted">Введите значение и нажмите "Обновить данные".</p>
+        {% endif %}
+    </div>
+
+    <p style="margin-top: 16px;"><a href="/">На главную</a></p>
+</div>
+
+<script>
+(function () {
+    const hasWarning = {{ warning_triggered|yesno:"true,false" }};
+    const hasAlarm = {{ alarm_triggered|yesno:"true,false" }};
+    if (!hasWarning && !hasAlarm) {
+        return;
+    }
+
+    function beep(freq, duration) {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "square";
+            osc.frequency.value = freq;
+            gain.gain.value = 0.03;
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            setTimeout(() => {
+                osc.stop();
+                ctx.close();
+            }, duration);
+        } catch (e) {}
+    }
+
+    if (hasAlarm) {
+        beep(880, 600);
+        setTimeout(() => beep(880, 500), 700);
+    } else if (hasWarning) {
+        beep(660, 350);
+    }
+})();
+</script>
+</body>
+</html>
