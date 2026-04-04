@@ -14,6 +14,7 @@ venv/
 .venv/
 env/
 .env/
+.env
 
 # Кэш и временные файлы
 *.pid
