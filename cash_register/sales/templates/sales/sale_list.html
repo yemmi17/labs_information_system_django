@@ -1,0 +1,40 @@
+{% extends "sales/base.html" %}
+
+{% block title %}Все продажи{% endblock %}
+
+{% block header_title %}Список продаж{% endblock %}
+
+{% block content %}
+<h2>Исходные данные (строки продаж)</h2>
+<p class="lead">Товар, группа, количество, цены, скидка (%).</p>
+{% if sales %}
+<table>
+  <thead>
+    <tr>
+      <th>Товар</th>
+      <th>Группа</th>
+      <th class="num">Кол-во</th>
+      <th class="num">Продажа (без скидки)</th>
+      <th class="num">Закупка</th>
+      <th class="num">Скидка %</th>
+      <th class="num">Прибыль строки</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in sales %}
+    <tr>
+      <td>{{ s.product_name }}</td>
+      <td>{{ s.product_group.name }}</td>
+      <td class="num">{{ s.quantity }}</td>
+      <td class="num">{{ s.sale_price|floatformat:2 }}</td>
+      <td class="num">{{ s.purchase_price|floatformat:2 }}</td>
+      <td class="num">{{ s.discount|floatformat:2 }}</td>
+      <td class="num profit">{{ s.line_profit|floatformat:2 }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="lead">Продаж пока нет.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "sales/base.html" %}
+
+{% block title %}Прибыль по группам — кассовые продажи{% endblock %}
+
+{% block content %}
+<h2>Сумма прибыли по группам товаров</h2>
+<p class="lead">
+  Формула по заданию: (цена продажи без скидки × количество) − (закупочная цена × количество)
+  для каждой строки; ниже — сумма по группе.
+</p>
+{% if rows %}
+<table>
+  <thead>
+    <tr>
+      <th>Группа товаров</th>
+      <th class="num">Сумма прибыли</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+      <td>{{ row.product_group__name }}</td>
+      <td class="num profit">{{ row.total_profit|floatformat:2 }}</td>
+    </tr>
+    {% endfor %}
+    <tr class="total-row">
+      <td>Итого</td>
+      <td class="num profit">{{ total_profit|floatformat:2 }}</td>
+    </tr>
+  </tbody>
+</table>
+{% else %}
+<p class="lead">Нет данных. Добавьте группы и продажи в <a href="/admin/">админке</a>.</p>
+{% endif %}
+{% endblock %}
