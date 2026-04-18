@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Справочник сотрудников{% endblock %}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <div>
+            <p class="eyebrow">Фирменный справочник</p>
+            <h1><a href="{% url 'home' %}">Управление данными сотрудников</a></h1>
+        </div>
+        <nav class="site-nav">
+            <a href="{% url 'employee_list' %}">Список сотрудников</a>
+            {% if request.user.is_authenticated %}
+                <span class="role-chip">{{ request.user.username }}</span>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="ghost-button">Выйти</button>
+                </form>
+            {% else %}
+                <a class="ghost-button" href="{% url 'login' %}">Вход по паролю</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="message {{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

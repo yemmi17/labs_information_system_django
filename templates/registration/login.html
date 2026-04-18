@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+<section class="panel narrow">
+    <p class="eyebrow">Авторизация</p>
+    <h2>Вход по паролю</h2>
+    <p>Для директора, заместителя директора и секретаря.</p>
+    <form method="post" class="employee-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="actions">
+            <button type="submit" class="primary-button">Войти</button>
+            <a class="ghost-button" href="{% url 'employee_list' %}">Продолжить как гость</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

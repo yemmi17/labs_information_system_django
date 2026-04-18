@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Главная | Справочник сотрудников{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <p class="eyebrow">Лабораторная работа на Django</p>
+        <h2>Система учёта сотрудников с разграничением прав доступа</h2>
+        <p>
+            Приложение хранит личные данные работников фирмы и показывает разные наборы полей
+            для директора, заместителя директора, секретаря и гостя.
+        </p>
+        <div class="actions">
+            <a class="primary-button" href="{% url 'employee_list' %}">Войти как гость</a>
+            <a class="ghost-button" href="{% url 'login' %}">Войти по паролю</a>
+        </div>
+    </div>
+    <div class="card">
+        <h3>Демо-доступы</h3>
+        <ul class="credential-list">
+            <li><strong>Директор:</strong> <code>director / director123</code></li>
+            <li><strong>Заместитель:</strong> <code>deputy / deputy123</code></li>
+            <li><strong>Секретарь:</strong> <code>secretary / secretary123</code></li>
+            <li><strong>Гость:</strong> без пароля через кнопку выше</li>
+        </ul>
+    </div>
+</section>
+{% endblock %}

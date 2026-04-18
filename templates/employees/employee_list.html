@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Сотрудники{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <p class="eyebrow">Список сотрудников</p>
+            <h2>Карточки работников фирмы</h2>
+            {% if is_guest %}
+                <p>Гость видит только ФИО, должность и рабочий телефон.</p>
+            {% elif can_delete %}
+                <p>Режим директора: полный доступ на просмотр, добавление, изменение и удаление.</p>
+            {% elif can_edit %}
+                <p>Режим заместителя директора: можно редактировать, но нельзя добавлять и удалять.</p>
+            {% else %}
+                <p>Режим секретаря: доступен полный просмотр без изменения данных.</p>
+            {% endif %}
+        </div>
+        {% if can_add %}
+            <a class="primary-button" href="{% url 'employee_create' %}">Добавить сотрудника</a>
+        {% endif %}
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Фамилия</th>
+                    <th>Имя</th>
+                    <th>Отчество</th>
+                    <th>Должность</th>
+                    {% if not is_guest %}
+                        <th>Адрес</th>
+                        <th>Рабочий телефон</th>
+                        <th>Личный телефон</th>
+                    {% else %}
+                        <th>Рабочий телефон</th>
+                    {% endif %}
+                    {% if can_edit or can_delete %}
+                        <th>Действия</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in employees %}
+                    <tr>
+                        <td>{{ employee.last_name }}</td>
+                        <td>{{ employee.first_name }}</td>
+                        <td>{{ employee.middle_name|default:"-" }}</td>
+                        <td>{{ employee.position }}</td>
+                        {% if not is_guest %}
+                            <td>{{ employee.address }}</td>
+                            <td>{{ employee.work_phone }}</td>
+                            <td>{{ employee.personal_phone }}</td>
+                        {% else %}
+                            <td>{{ employee.work_phone }}</td>
+                        {% endif %}
+                        {% if can_edit or can_delete %}
+                            <td class="actions-cell">
+                                {% if can_edit %}
+                                    <a class="inline-link" href="{% url 'employee_update' employee.pk %}">Изменить</a>
+                                {% endif %}
+                                {% if can_delete %}
+                                    <a class="inline-link danger-link" href="{% url 'employee_delete' employee.pk %}">Удалить</a>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8">Сотрудники пока не добавлены.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

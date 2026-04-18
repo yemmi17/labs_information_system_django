@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Удаление сотрудника{% endblock %}
+
+{% block content %}
+<section class="panel narrow">
+    <p class="eyebrow">Подтверждение удаления</p>
+    <h2>Удалить сотрудника {{ employee }}?</h2>
+    <p>Это действие доступно только директору.</p>
+    <form method="post" class="actions">
+        {% csrf_token %}
+        <button type="submit" class="danger-button">Удалить</button>
+        <a class="ghost-button" href="{% url 'employee_list' %}">Отмена</a>
+    </form>
+</section>
+{% endblock %}
