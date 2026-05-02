@@ -1,3 +1,16 @@
+# -*- coding: cp1251 -*-
+"""
+================================================================================
+employees.tests
+--------------------------------------------------------------------------------
+Модуль содержит тесты доступа для ролей пользователей, проверяющие
+правила отображения страниц и ограничения CRUD операций.
+
+Изменение выполнено: GitHub Copilot, 18.04.2026
+Причина: добавить документацию к тестам и разъяснить логику проверки прав.
+================================================================================
+"""
+
 from django.contrib.auth.models import Group, User
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -6,8 +19,11 @@ from .models import Employee
 
 
 class EmployeeAccessTests(TestCase):
+    """Набор тестов для проверки доступа к страницам управления сотрудниками."""
+
     @classmethod
     def setUpTestData(cls):
+        """Создает тестовые данные, которые используются во всех тестах класса."""
         cls.employee = Employee.objects.create(
             last_name="Тестов",
             first_name="Тест",
@@ -19,9 +35,11 @@ class EmployeeAccessTests(TestCase):
         )
 
     def setUp(self):
+        """Настраивает HTTP-клиент для каждого отдельного теста."""
         self.client = Client()
 
     def test_guest_sees_only_public_fields(self):
+        """Гость видит только публичные поля сотрудника и не видит закрытую информацию."""
         response = self.client.get(reverse("employee_list"))
 
         self.assertContains(response, "Тестов")
@@ -31,6 +49,7 @@ class EmployeeAccessTests(TestCase):
         self.assertNotContains(response, "+7 (999) 444-44-44")
 
     def test_secretary_cannot_open_create_page(self):
+        """Секретарь не имеет права открывать страницу создания сотрудника."""
         user = self._create_user("sec-test", "secretary")
         self.client.force_login(user)
 
@@ -39,6 +58,7 @@ class EmployeeAccessTests(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_deputy_can_edit_but_cannot_delete(self):
+        """Заместитель имеет право редактирования, но не удаления сотрудников."""
         user = self._create_user("dep-test", "deputy")
         self.client.force_login(user)
 
@@ -49,6 +69,7 @@ class EmployeeAccessTests(TestCase):
         self.assertEqual(delete_response.status_code, 403)
 
     def test_director_can_open_all_management_pages(self):
+        """Директор может открыть все страницы управления сотрудниками."""
         user = self._create_user("dir-test", "director")
         self.client.force_login(user)
 
@@ -61,9 +82,8 @@ class EmployeeAccessTests(TestCase):
         self.assertEqual(delete_response.status_code, 200)
 
     def _create_user(self, username, group_name):
+        """Создает пользователя и добавляет его в указанную группу ролевых прав."""
         user = User.objects.create_user(username=username, password="pass12345")
         group = Group.objects.get(name=group_name)
         user.groups.add(group)
         return user
-
-# Create your tests here.

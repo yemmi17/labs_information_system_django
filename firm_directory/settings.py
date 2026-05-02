@@ -1,3 +1,4 @@
+# -*- coding: cp1251 -*-
 """
 Django settings for firm_directory project.
 
@@ -12,24 +13,23 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Корневая директория проекта, используется для построения абсолютных путей.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+# Быстрые настройки для разработки. Не использовать в production без проверки.
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# Секретный ключ Django, необходим для подписи данных сессий и CSRF.
 SECRET_KEY = 'django-insecure-99m(8ci@#q!19$^ck7)_%%n_op#tw8yql*0d9c5o-sc3^x_#%#'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# Включение режима отладки в процессе разработки.
 DEBUG = True
 
+# Список хостов, допустимых для обработки запросов.
 ALLOWED_HOSTS = []
 
 
-# Application definition
-
+# Приложения Django, активированные в проекте.
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'employees.apps.EmployeesConfig',
 ]
 
+# Список middleware, которые обрабатывают HTTP-запросы и ответы.
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -50,8 +51,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Корневой модуль URL-конфигурации проекта.
 ROOT_URLCONF = 'firm_directory.urls'
 
+# Настройки шаблонов Django, включая каталоги для поиска HTML-файлов.
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -67,12 +70,12 @@ TEMPLATES = [
     },
 ]
 
+# Указывает WSGI-приложение для запуска на сервере.
 WSGI_APPLICATION = 'firm_directory.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
+# Настройки базы данных.
+# Для данного проекта используется SQLite с файлом в корне проекта.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -81,9 +84,7 @@ DATABASES = {
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
-
+# Валидация паролей, обеспечивающая безопасность пользовательских учетных записей.
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -100,26 +101,21 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
-
+# Локализация и часовой пояс проекта.
 LANGUAGE_CODE = 'ru-ru'
-
 TIME_ZONE = 'Europe/Moscow'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
+# Настройки статических файлов проекта.
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
+# Параметры переадресации после аутентификации.
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'employee_list'
 LOGOUT_REDIRECT_URL = 'home'
 
+# Автоматический тип поля для первичных ключей моделей по умолчанию.
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

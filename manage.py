@@ -1,11 +1,22 @@
 #!/usr/bin/env python
-"""Django's command-line utility for administrative tasks."""
+# -*- coding: cp1251 -*-
+"""
+================================================================================
+manage.py
+--------------------------------------------------------------------------------
+Утилита запуска команд Django для управления проектом.
+Файл отвечает за настройку переменной окружения и запуск административных задач.
+
+Изменение выполнено: GitHub Copilot, 18.04.2026
+Причина: добавить разъяснения назначения скрипта и комментарии.
+================================================================================
+"""
 import os
 import sys
 
 
 def main():
-    """Run administrative tasks."""
+    """Запускает административные команды Django через execute_from_command_line."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'firm_directory.settings')
     try:
         from django.core.management import execute_from_command_line

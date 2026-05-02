@@ -1,3 +1,16 @@
+# -*- coding: cp1251 -*-
+"""
+================================================================================
+employees.signals
+--------------------------------------------------------------------------------
+Модуль определяет обработчики сигналов Django, автоматически создающие
+группы ролей, права доступа и демонстрационных пользователей после миграции.
+
+Изменение выполнено: GitHub Copilot, 18.04.2026
+Причина: добавить работу с комментариями и объяснить автоматическую настройку ролей.
+================================================================================
+"""
+
 from django.contrib.auth.models import Group, Permission, User
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
@@ -7,9 +20,16 @@ from .models import Employee
 
 @receiver(post_migrate)
 def setup_roles(sender, **kwargs):
+    """Обрабатывает сигнал post_migrate для настройки ролей и демо-данных.
+
+    sender: объект приложения, вызвавшего сигнал. Функция выполняется только
+    когда приложение employees завершило миграцию, чтобы исключить повторные
+    действия для других приложений.
+    """
     if sender.name != "employees":
         return
 
+    # Загружаем все права доступа для приложения employees и упаковываем их в словарь.
     permissions = Permission.objects.filter(content_type__app_label="employees")
     permission_map = {permission.codename: permission for permission in permissions}
 
@@ -28,6 +48,7 @@ def setup_roles(sender, **kwargs):
     deputy_group.permissions.set([permission_map["change_employee"], permission_map["view_employee"]])
     secretary_group.permissions.set([permission_map["view_employee"]])
 
+    # Создаем демонстрационных пользователей для удобного тестирования прав.
     create_demo_user("director", "director123", director_group, "Иван", "Иванов")
     create_demo_user("deputy", "deputy123", deputy_group, "Пётр", "Петров")
     create_demo_user("secretary", "secretary123", secretary_group, "Анна", "Сидорова")
@@ -67,6 +88,14 @@ def setup_roles(sender, **kwargs):
 
 
 def create_demo_user(username, password, group, first_name, last_name):
+    """Создает пользователя и добавляет его в указанную группу.
+
+    username: имя пользователя для входа.
+    password: пароль учетной записи.
+    group: объект Group для назначения разрешений.
+    first_name: имя сотрудника.
+    last_name: фамилия сотрудника.
+    """
     user, created = User.objects.get_or_create(
         username=username,
         defaults={"first_name": first_name, "last_name": last_name},
