@@ -12,11 +12,13 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.db.models import Sum
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from .forms import EmployeeForm
-from .models import Employee
+from .models import Employee, Expense
 
 
 def home(request):
@@ -80,6 +82,28 @@ def employee_list(request):
     }
     # Передаем контекст в HTML-шаблон списка сотрудников.
     return render(request, "employees/employee_list.html", context)
+
+
+def expense_report(request):
+    """Формирует отчет по издержкам организации за выбранный период."""
+    # Если пользователь не выбрал период, показываем отчет за текущий месяц.
+    today = timezone.localdate()
+    default_date_from = today.replace(day=1)
+    date_from = request.GET.get("date_from") or default_date_from.isoformat()
+    date_to = request.GET.get("date_to") or today.isoformat()
+
+    # QuerySet строится пошагово: сначала период, затем группировка по статье издержек.
+    expenses = Expense.objects.filter(date__gte=date_from, date__lte=date_to)
+    report_rows = expenses.values("article").annotate(total_amount=Sum("amount")).order_by("article")
+    total_amount = expenses.aggregate(total_amount=Sum("amount"))["total_amount"] or 0
+
+    context = {
+        "date_from": date_from,
+        "date_to": date_to,
+        "report_rows": report_rows,
+        "total_amount": total_amount,
+    }
+    return render(request, "employees/expense_report.html", context)
 
 
 @login_required

@@ -24,6 +24,8 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     # Публичный и авторизованный список сотрудников.
     path("employees/", views.employee_list, name="employee_list"),
+    # Отчет по суммам издержек организации за выбранный период.
+    path("reports/expenses/", views.expense_report, name="expense_report"),
     # Создание сотрудника; серверная проверка прав находится во view.
     path("employees/add/", views.employee_create, name="employee_create"),
     # Редактирование сотрудника по первичному ключу pk.

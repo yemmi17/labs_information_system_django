@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{# Шаблон отчета: выводит суммы издержек по статьям за выбранный период. #}
+
+{% block title %}Издержки организации{% endblock %}
+
+{% block content %}
+<!-- Панель отчета содержит фильтр периода, таблицу группировки и итоговую сумму. -->
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <p class="eyebrow">Отчет</p>
+            <h2>Издержки организации</h2>
+            <p>Суммы издержек сгруппированы по статьям за выбранный период.</p>
+        </div>
+    </div>
+
+    <!-- GET-форма позволяет менять период отчета без изменения данных в базе. -->
+    <form class="report-filter" method="get">
+        <p>
+            <label for="date_from">Дата начала</label>
+            <input id="date_from" type="date" name="date_from" value="{{ date_from }}">
+        </p>
+        <p>
+            <label for="date_to">Дата окончания</label>
+            <input id="date_to" type="date" name="date_to" value="{{ date_to }}">
+        </p>
+        <button class="primary-button" type="submit">Сформировать отчет</button>
+    </form>
+
+    <!-- Таблица отчета повторяет формулировку задания: статья издержек и сумма величины. -->
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Статья издержек</th>
+                    <th>Сумма за период</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in report_rows %}
+                    <tr>
+                        <td>{{ row.article }}</td>
+                        <td>{{ row.total_amount }} руб.</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2">За выбранный период издержки не найдены.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Итого</th>
+                    <th>{{ total_amount }} руб.</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</section>
+{% endblock %}

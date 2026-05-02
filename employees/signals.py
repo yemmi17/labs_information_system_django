@@ -12,7 +12,7 @@ from django.contrib.auth.models import Group, Permission, User
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 
-from .models import Employee
+from .models import Employee, Expense
 
 
 @receiver(post_migrate)
@@ -95,6 +95,19 @@ def setup_roles(sender, **kwargs):
                     work_phone="+7 (495) 300-30-30",
                     personal_phone="+7 (999) 333-33-33",
                 ),
+            ]
+        )
+
+    # Демонстрационные издержки нужны, чтобы отчет сразу показывал группировку по статьям.
+    if not Expense.objects.exists():
+        Expense.objects.bulk_create(
+            [
+                Expense(article="Аренда помещения", amount="45000.00", date="2026-04-01"),
+                Expense(article="Аренда помещения", amount="45000.00", date="2026-05-01"),
+                Expense(article="Интернет и связь", amount="5200.00", date="2026-04-10"),
+                Expense(article="Интернет и связь", amount="5300.00", date="2026-05-10"),
+                Expense(article="Транспортные расходы", amount="12800.00", date="2026-04-18"),
+                Expense(article="Канцелярские товары", amount="3700.00", date="2026-05-15"),
             ]
         )
 

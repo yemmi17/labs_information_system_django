@@ -73,3 +73,26 @@ class Employee(models.Model):
         """
         # Используем reverse(), чтобы не хардкодить URL и сохранить связность с URLconf.
         return reverse("employee_list")
+
+
+class Expense(models.Model):
+    """Представляет отдельную издержку организации для построения отчета."""
+
+    # Статья издержек: аренда, связь, транспорт и другие учебные категории затрат.
+    article = models.CharField("Статья издержек", max_length=150)
+    # Сумма хранится как Decimal, потому что деньги нельзя надежно считать через float.
+    amount = models.DecimalField("Сумма", max_digits=10, decimal_places=2)
+    # Дата нужна для отбора издержек за выбранный пользователем период.
+    date = models.DateField("Дата")
+
+    class Meta:
+        """Метаданные модели Expense для ORM и административного интерфейса."""
+
+        # Сначала показываем новые операции, затем сортируем одинаковые даты по статье.
+        ordering = ("-date", "article")
+        verbose_name = "Издержка"
+        verbose_name_plural = "Издержки"
+
+    def __str__(self):
+        """Возвращает читаемое представление издержки."""
+        return f"{self.article}: {self.amount} руб. от {self.date:%d.%m.%Y}"

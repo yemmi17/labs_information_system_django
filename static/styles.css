@@ -213,13 +213,37 @@ th {
     margin-bottom: 1rem;
 }
 
-/* Единый вид текстовых input внутри формы сотрудника. */
-.employee-form input {
+/* Фильтр отчета располагает поля периода и кнопку в одну строку на широком экране. */
+.report-filter {
+    display: flex;
+    align-items: end;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+/* Поля фильтра отчета сохраняют тот же вертикальный вид подписи и input. */
+.report-filter p {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0;
+}
+
+/* Единый вид input внутри формы сотрудника и фильтра отчета. */
+.employee-form input,
+.report-filter input {
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: 0.85rem 1rem;
     font: inherit;
     background: #fff;
+}
+
+/* Итоговая строка отчета визуально отделяется от обычных строк. */
+tfoot th {
+    color: var(--ink);
+    background: #fff4e8;
 }
 
 /* Список flash-сообщений Django без стандартных маркеров. */

@@ -12,7 +12,7 @@ from django.contrib.auth.models import Group, User
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from .models import Employee
+from .models import Employee, Expense
 
 
 class EmployeeAccessTests(TestCase):
@@ -132,3 +132,36 @@ class EmployeeAccessTests(TestCase):
         user.groups.add(group)
         # Возвращаем пользователя вызывающему тесту для авторизации.
         return user
+
+
+class ExpenseReportTests(TestCase):
+    """Набор тестов для проверки отчета по издержкам организации."""
+
+    @classmethod
+    def setUpTestData(cls):
+        """Создает издержки с разными статьями и датами для проверки периода."""
+        # Очищаем демо-данные из post_migrate, чтобы тест проверял только свои фикстуры.
+        Expense.objects.all().delete()
+        Expense.objects.bulk_create(
+            [
+                Expense(article="Аренда", amount="1000.00", date="2026-04-01"),
+                Expense(article="Аренда", amount="1500.00", date="2026-04-15"),
+                Expense(article="Связь", amount="500.00", date="2026-04-20"),
+                Expense(article="Транспорт", amount="700.00", date="2026-05-01"),
+            ]
+        )
+
+    def test_report_groups_expenses_by_article_for_selected_period(self):
+        """Отчет группирует издержки по статьям и считает итог только за выбранный период."""
+        response = self.client.get(
+            reverse("expense_report"),
+            {"date_from": "2026-04-01", "date_to": "2026-04-30"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Аренда")
+        self.assertContains(response, "2500")
+        self.assertContains(response, "Связь")
+        self.assertContains(response, "500")
+        self.assertContains(response, "3000")
+        self.assertNotContains(response, "Транспорт")

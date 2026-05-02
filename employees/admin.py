@@ -10,7 +10,7 @@
 
 from django.contrib import admin
 
-from .models import Employee
+from .models import Employee, Expense
 
 
 @admin.register(Employee)
@@ -28,3 +28,15 @@ class EmployeeAdmin(admin.ModelAdmin):
     list_display = ("last_name", "first_name", "middle_name", "position", "work_phone")
     # Поля, по которым Django admin выполняет текстовый поиск.
     search_fields = ("last_name", "first_name", "middle_name", "position", "work_phone", "personal_phone")
+
+
+@admin.register(Expense)
+class ExpenseAdmin(admin.ModelAdmin):
+    """Настройки отображения издержек в административной панели Django."""
+
+    # Колонки, достаточные для быстрого просмотра учебных данных отчета.
+    list_display = ("article", "amount", "date")
+    # Фильтр по дате помогает проверять отчетные периоды в админке.
+    list_filter = ("date",)
+    # Поиск по статье издержек удобен при ручном наполнении тестовых данных.
+    search_fields = ("article",)
