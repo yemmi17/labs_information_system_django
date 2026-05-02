@@ -11,6 +11,7 @@
 import os
 import sys
 
+# test comment
 
 def main():
     """Запускает административные команды Django через execute_from_command_line.
