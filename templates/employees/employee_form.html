@@ -1,13 +1,17 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{# Шаблон формы: используется и для создания, и для редактирования сотрудника. #}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
+<!-- Узкая панель ограничивает ширину формы ввода данных сотрудника. -->
 <section class="panel narrow">
     <p class="eyebrow">Редактирование данных</p>
     <h2>{{ title }}</h2>
+    <!-- POST-форма защищена CSRF-токеном Django. -->
     <form method="post" class="employee-form">
         {% csrf_token %}
+        {# form.as_p выводит поля, заданные в EmployeeForm.Meta.fields. #}
         {{ form.as_p }}
         <div class="actions">
             <button type="submit" class="primary-button">Сохранить</button>

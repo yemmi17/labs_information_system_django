@@ -1,13 +1,16 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{# Шаблон списка сотрудников: выводит разные поля и действия в зависимости от роли. #}
 
 {% block title %}Сотрудники{% endblock %}
 
 {% block content %}
+<!-- Панель списка сотрудников содержит описание режима доступа и таблицу. -->
 <section class="panel">
     <div class="panel-header">
         <div>
             <p class="eyebrow">Список сотрудников</p>
             <h2>Карточки работников фирмы</h2>
+            {# Текст режима доступа синхронизирован с флагами из employees.views.employee_list. #}
             {% if is_guest %}
                 <p>Гость видит только ФИО, должность и рабочий телефон.</p>
             {% elif can_delete %}
@@ -18,11 +21,13 @@
                 <p>Режим секретаря: доступен полный просмотр без изменения данных.</p>
             {% endif %}
         </div>
+        {# Кнопка добавления показывается только роли director. #}
         {% if can_add %}
             <a class="primary-button" href="{% url 'employee_create' %}">Добавить сотрудника</a>
         {% endif %}
     </div>
 
+    <!-- Таблица сотрудников; часть колонок скрывается от гостя. -->
     <div class="table-wrap">
         <table>
             <thead>
@@ -31,6 +36,7 @@
                     <th>Имя</th>
                     <th>Отчество</th>
                     <th>Должность</th>
+                    {# Гость не получает адрес и личный телефон даже на уровне шаблона. #}
                     {% if not is_guest %}
                         <th>Адрес</th>
                         <th>Рабочий телефон</th>
@@ -44,6 +50,7 @@
                 </tr>
             </thead>
             <tbody>
+                {# Каждая строка таблицы соответствует одной записи Employee. #}
                 {% for employee in employees %}
                     <tr>
                         <td>{{ employee.last_name }}</td>
@@ -59,6 +66,7 @@
                         {% endif %}
                         {% if can_edit or can_delete %}
                             <td class="actions-cell">
+                                {# Действия рендерятся отдельно, чтобы роли deputy/director отличались. #}
                                 {% if can_edit %}
                                     <a class="inline-link" href="{% url 'employee_update' employee.pk %}">Изменить</a>
                                 {% endif %}
@@ -69,6 +77,7 @@
                         {% endif %}
                     </tr>
                 {% empty %}
+                    {# Защита отображения пустого справочника. #}
                     <tr>
                         <td colspan="8">Сотрудники пока не добавлены.</td>
                     </tr>

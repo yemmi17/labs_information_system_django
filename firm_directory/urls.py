@@ -1,33 +1,19 @@
-# -*- coding: cp1251 -*-
-"""
-================================================================================
-firm_directory.urls
---------------------------------------------------------------------------------
-URL-конфигурация основного проекта firm_directory.
-Содержит маршруты для административной панели и маршруты приложения employees.
-
-Изменение выполнено: GitHub Copilot, 18.04.2026
-Причина: добавить описание назначения модуля и контекст маршрутов.
-================================================================================
-URL configuration for firm_directory project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
+﻿# -*- coding: utf-8 -*-
+# ===== Служебный комментарий модуля ==========================================
+# Модуль: firm_directory.urls
+# Назначение: корневая URL-конфигурация проекта firm_directory.
+# Исполнитель изменения: Yemmi
+# Дата изменения: 02.05.2026
+# Причина изменения: оставить техническое описание маршрутов проекта.
+# Первоначальный фрагмент: стандартный urls.py Django после startproject.
+# =============================================================================
 from django.contrib import admin
 from django.urls import include, path
 
+# Глобальная переменная: корневой список URL-маршрутов проекта.
 urlpatterns = [
+    # Маршрут административной панели Django.
     path('admin/', admin.site.urls),
+    # Делегирование всех пользовательских маршрутов приложению employees.
     path('', include('employees.urls')),
 ]

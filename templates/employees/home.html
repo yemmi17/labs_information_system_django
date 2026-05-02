@@ -1,8 +1,10 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{# Шаблон главной страницы: описывает назначение приложения и демонстрационные входы. #}
 
 {% block title %}Главная | Справочник сотрудников{% endblock %}
 
 {% block content %}
+<!-- Hero-секция является стартовым экраном лабораторного приложения. -->
 <section class="hero">
     <div class="hero-copy">
         <p class="eyebrow">Лабораторная работа на Django</p>
@@ -16,6 +18,7 @@
             <a class="ghost-button" href="{% url 'login' %}">Войти по паролю</a>
         </div>
     </div>
+    <!-- Карточка с демонстрационными учетными записями для проверки ролей. -->
     <div class="card">
         <h3>Демо-доступы</h3>
         <ul class="credential-list">

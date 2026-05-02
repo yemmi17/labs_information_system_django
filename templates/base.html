@@ -1,17 +1,32 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
+<!--
+Служебный комментарий шаблона:
+Модуль: templates/base.html
+Назначение: базовый HTML-каркас всех страниц приложения.
+Исполнитель изменения: Yemmi
+Дата изменения: 02.05.2026
+Причина изменения: добавить HTML-комментарии к структуре интерфейса.
+Первоначальный фрагмент: базовый шаблон с блоками title/content.
+-->
 <html lang="ru">
 <head>
+    <!-- Кодировка страницы должна совпадать с UTF-8 исходников. -->
     <meta charset="UTF-8">
+    <!-- Viewport нужен для корректного отображения на мобильных экранах. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Блок title переопределяется дочерними шаблонами. -->
     <title>{% block title %}Справочник сотрудников{% endblock %}</title>
+    <!-- Подключение общего CSS-файла проекта. -->
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
+    <!-- Общая шапка сайта с названием и навигацией. -->
     <header class="site-header">
         <div>
             <p class="eyebrow">Фирменный справочник</p>
             <h1><a href="{% url 'home' %}">Управление данными сотрудников</a></h1>
         </div>
+        <!-- Навигация меняется в зависимости от факта авторизации. -->
         <nav class="site-nav">
             <a href="{% url 'employee_list' %}">Список сотрудников</a>
             {% if request.user.is_authenticated %}
@@ -26,7 +41,9 @@
         </nav>
     </header>
 
+    <!-- Основная область страницы; содержимое задают дочерние шаблоны. -->
     <main class="page-shell">
+        <!-- Блок flash-сообщений Django после создания, изменения или удаления. -->
         {% if messages %}
             <ul class="messages">
                 {% for message in messages %}
@@ -34,6 +51,7 @@
                 {% endfor %}
             </ul>
         {% endif %}
+        <!-- Точка расширения для конкретной страницы. -->
         {% block content %}{% endblock %}
     </main>
 </body>
