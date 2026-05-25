@@ -11,8 +11,10 @@
 from django.contrib.auth.models import Group, User
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils import timezone
 
-from .models import Employee
+from .forms import WaybillForm
+from .models import Car, Driver, DriverCar, Employee, Waybill
 
 
 class EmployeeAccessTests(TestCase):
@@ -132,3 +134,75 @@ class EmployeeAccessTests(TestCase):
         user.groups.add(group)
         # Возвращаем пользователя вызывающему тесту для авторизации.
         return user
+
+
+class TransportAccountingTests(TestCase):
+    """Проверки лабораторной №9: пробег, расход топлива и ограничения формы."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.employee = Employee.objects.create(
+            last_name="Иванов",
+            first_name="Иван",
+            position="Водитель",
+            address="Москва",
+            work_phone="+7",
+            personal_phone="+7",
+        )
+        cls.driver = Driver.objects.create(employee=cls.employee)
+        cls.car = Car.objects.create(
+            brand="ГАЗ",
+            plate_number="А001АА",
+            production_year=2020,
+            fuel_rate_per_km="0.120",
+        )
+        DriverCar.objects.create(driver=cls.driver, car=cls.car)
+
+    def test_waybill_calculates_distance_and_fuel_consumption(self):
+        waybill = Waybill.objects.create(
+            driver=self.driver,
+            car=self.car,
+            departure_time=timezone.now(),
+            arrival_time=timezone.now() + timezone.timedelta(hours=2),
+            start_mileage=1000,
+            end_mileage=1150,
+        )
+
+        self.assertEqual(waybill.distance, 150)
+        self.assertEqual(str(waybill.fuel_consumption), "18.000")
+
+    def test_waybill_form_rejects_unassigned_car(self):
+        other_car = Car.objects.create(
+            brand="УАЗ",
+            plate_number="В002ВВ",
+            production_year=2021,
+            fuel_rate_per_km="0.150",
+        )
+        form = WaybillForm(
+            data={
+                "driver": self.driver.pk,
+                "car": other_car.pk,
+                "departure_time": "2026-05-25T10:00",
+                "arrival_time": "2026-05-25T12:00",
+                "start_mileage": 10,
+                "end_mileage": 20,
+            }
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("car", form.errors)
+
+    def test_transport_dashboard_renders_stats(self):
+        Waybill.objects.create(
+            driver=self.driver,
+            car=self.car,
+            departure_time=timezone.now(),
+            arrival_time=timezone.now() + timezone.timedelta(hours=1),
+            start_mileage=0,
+            end_mileage=50,
+        )
+
+        response = self.client.get(reverse("transport_dashboard"))
+
+        self.assertContains(response, "Учет пробега автотранспорта")
+        self.assertContains(response, "50 км")

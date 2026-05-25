@@ -8,6 +8,8 @@
 # Первоначальный фрагмент: Django-модель Employee с краткими docstring.
 # =============================================================================
 
+from decimal import Decimal
+
 from django.db import models
 from django.urls import reverse
 
@@ -73,3 +75,77 @@ class Employee(models.Model):
         """
         # Используем reverse(), чтобы не хардкодить URL и сохранить связность с URLconf.
         return reverse("employee_list")
+
+
+class Car(models.Model):
+    """Справочник автомобилей для лабораторной работы №9."""
+
+    brand = models.CharField("Марка автомобиля", max_length=100)
+    plate_number = models.CharField("Гос. номер", max_length=20, unique=True)
+    production_year = models.PositiveIntegerField("Год выпуска")
+    fuel_rate_per_km = models.DecimalField("Норма расхода литров на 1 км", max_digits=6, decimal_places=3)
+
+    class Meta:
+        ordering = ("plate_number",)
+        verbose_name = "Автомобиль"
+        verbose_name_plural = "Автомобили"
+
+    def __str__(self):
+        return f"{self.brand} {self.plate_number}"
+
+
+class Driver(models.Model):
+    """Справочник водителей, связанный с сотрудниками."""
+
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name="Сотрудник")
+    cars = models.ManyToManyField(Car, through="DriverCar", verbose_name="Автомобили")
+
+    class Meta:
+        ordering = ("employee__last_name", "employee__first_name")
+        verbose_name = "Водитель"
+        verbose_name_plural = "Водители"
+
+    def __str__(self):
+        return str(self.employee)
+
+
+class DriverCar(models.Model):
+    """Связь водитель-автомобиль, позволяющая одному водителю иметь несколько машин."""
+
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, verbose_name="Водитель")
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, verbose_name="Автомобиль")
+
+    class Meta:
+        unique_together = ("driver", "car")
+        verbose_name = "Автомобиль водителя"
+        verbose_name_plural = "Автомобили водителей"
+
+    def __str__(self):
+        return f"{self.driver} - {self.car}"
+
+
+class Waybill(models.Model):
+    """Документ путевого листа с вычисляемым пробегом и расходом топлива."""
+
+    driver = models.ForeignKey(Driver, on_delete=models.CASCADE, verbose_name="Водитель")
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, verbose_name="Автомобиль")
+    departure_time = models.DateTimeField("Время выезда")
+    arrival_time = models.DateTimeField("Время заезда")
+    start_mileage = models.PositiveIntegerField("Начальный километраж")
+    end_mileage = models.PositiveIntegerField("Конечный километраж")
+
+    class Meta:
+        ordering = ("-departure_time",)
+        verbose_name = "Путевой лист"
+        verbose_name_plural = "Путевые листы"
+
+    def __str__(self):
+        return f"Путевой лист {self.driver} / {self.car}"
+
+    @property
+    def distance(self):
+        return max(self.end_mileage - self.start_mileage, 0)
+
+    @property
+    def fuel_consumption(self):
+        return Decimal(self.distance) * Decimal(self.car.fuel_rate_per_km)

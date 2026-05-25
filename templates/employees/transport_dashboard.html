@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Учет автотранспорта{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <p class="eyebrow">Лабораторная работа №9</p>
+            <h2>Учет пробега автотранспорта</h2>
+            <p>Справочники автомобилей и водителей, документ "Путевой лист", расчет пробега и расхода топлива.</p>
+        </div>
+        <div class="actions">
+            <a class="ghost-button" href="{% url 'car_create' %}">Автомобиль</a>
+            <a class="ghost-button" href="{% url 'driver_create' %}">Водитель</a>
+            <a class="ghost-button" href="{% url 'driver_car_create' %}">Назначение</a>
+            <a class="primary-button" href="{% url 'waybill_create' %}">Путевой лист</a>
+        </div>
+    </div>
+
+    <div class="metrics-grid">
+        <div class="card">
+            <strong>{{ cars|length }}</strong>
+            <span>автомобилей</span>
+        </div>
+        <div class="card">
+            <strong>{{ drivers|length }}</strong>
+            <span>водителей</span>
+        </div>
+        <div class="card">
+            <strong>{{ waybills|length }}</strong>
+            <span>путевых листов</span>
+        </div>
+    </div>
+
+    <div class="chart-grid">
+        <div class="card">
+            <h3>Пробег по водителям</h3>
+            <p class="chart-note">Средний пробег: {{ avg_distance|floatformat:1 }} км</p>
+            {% for item in driver_stats %}
+                <div class="bar-row">
+                    <span>{{ item.driver__employee__last_name }} {{ item.driver__employee__first_name }}</span>
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width: {% widthratio item.total_distance avg_distance 50 %}%"></div>
+                    </div>
+                    <strong>{{ item.total_distance }} км</strong>
+                </div>
+            {% empty %}
+                <p>Нет данных для диаграммы.</p>
+            {% endfor %}
+            <div class="average-line">Среднее</div>
+        </div>
+        <div class="card">
+            <h3>Расход топлива по автомобилям</h3>
+            <p class="chart-note">Средний расход: {{ avg_fuel|floatformat:2 }} л</p>
+            {% for item in car_stats %}
+                <div class="bar-row">
+                    <span>{{ item.car__brand }} {{ item.car__plate_number }}</span>
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width: {% widthratio item.total_fuel avg_fuel 50 %}%"></div>
+                    </div>
+                    <strong>{{ item.total_fuel|floatformat:2 }} л</strong>
+                </div>
+            {% empty %}
+                <p>Нет данных для диаграммы.</p>
+            {% endfor %}
+            <div class="average-line">Среднее</div>
+        </div>
+    </div>
+
+    <h3>Путевые листы</h3>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Водитель</th>
+                    <th>Автомобиль</th>
+                    <th>Выезд</th>
+                    <th>Заезд</th>
+                    <th>Пробег</th>
+                    <th>Расход топлива</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in waybills %}
+                    <tr>
+                        <td>{{ item.driver }}</td>
+                        <td>{{ item.car }}</td>
+                        <td>{{ item.departure_time }}</td>
+                        <td>{{ item.arrival_time }}</td>
+                        <td>{{ item.distance }} км</td>
+                        <td>{{ item.fuel_consumption|floatformat:2 }} л</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">Путевые листы пока не добавлены.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

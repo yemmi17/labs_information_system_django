@@ -12,11 +12,12 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.db.models import Avg, DecimalField, ExpressionWrapper, F, Sum
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import EmployeeForm
-from .models import Employee
+from .forms import CarForm, DriverCarForm, DriverForm, EmployeeForm, WaybillForm
+from .models import Car, Driver, DriverCar, Employee, Waybill
 
 
 def home(request):
@@ -164,6 +165,74 @@ def employee_delete(request, pk):
 
     # Для GET показываем страницу подтверждения удаления.
     return render(request, "employees/employee_confirm_delete.html", {"employee": employee})
+
+
+def transport_dashboard(request):
+    """Показывает учет пробега и расхода топлива для лабораторной №9."""
+    waybills = Waybill.objects.select_related("driver__employee", "car")
+    distance_expr = F("end_mileage") - F("start_mileage")
+    fuel_expr = ExpressionWrapper(distance_expr * F("car__fuel_rate_per_km"), output_field=DecimalField())
+
+    driver_stats = (
+        waybills.values("driver_id", "driver__employee__last_name", "driver__employee__first_name")
+        .annotate(total_distance=Sum(distance_expr))
+        .order_by("driver__employee__last_name")
+    )
+    car_stats = (
+        waybills.values("car_id", "car__brand", "car__plate_number")
+        .annotate(total_fuel=Sum(fuel_expr))
+        .order_by("car__plate_number")
+    )
+
+    avg_distance = driver_stats.aggregate(value=Avg("total_distance"))["value"] or 0
+    avg_fuel = car_stats.aggregate(value=Avg("total_fuel"))["value"] or 0
+    context = {
+        "cars": Car.objects.all(),
+        "drivers": Driver.objects.select_related("employee").all(),
+        "driver_cars": DriverCar.objects.select_related("driver__employee", "car"),
+        "waybills": waybills,
+        "driver_stats": driver_stats,
+        "car_stats": car_stats,
+        "avg_distance": avg_distance,
+        "avg_fuel": avg_fuel,
+    }
+    return render(request, "employees/transport_dashboard.html", context)
+
+
+def car_create(request):
+    form = CarForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Автомобиль добавлен.")
+        return redirect("transport_dashboard")
+    return render(request, "employees/simple_form.html", {"form": form, "title": "Добавить автомобиль"})
+
+
+def driver_create(request):
+    form = DriverForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Водитель добавлен.")
+        return redirect("transport_dashboard")
+    return render(request, "employees/simple_form.html", {"form": form, "title": "Добавить водителя"})
+
+
+def driver_car_create(request):
+    form = DriverCarForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Автомобиль назначен водителю.")
+        return redirect("transport_dashboard")
+    return render(request, "employees/simple_form.html", {"form": form, "title": "Назначить автомобиль водителю"})
+
+
+def waybill_create(request):
+    form = WaybillForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Путевой лист добавлен.")
+        return redirect("transport_dashboard")
+    return render(request, "employees/simple_form.html", {"form": form, "title": "Добавить путевой лист"})
 
 
 # ===== Функции проверки прав доступа =====

@@ -30,4 +30,9 @@ urlpatterns = [
     path("employees/<int:pk>/edit/", views.employee_update, name="employee_update"),
     # Удаление сотрудника по первичному ключу pk после подтверждения.
     path("employees/<int:pk>/delete/", views.employee_delete, name="employee_delete"),
+    path("transport/", views.transport_dashboard, name="transport_dashboard"),
+    path("transport/cars/add/", views.car_create, name="car_create"),
+    path("transport/drivers/add/", views.driver_create, name="driver_create"),
+    path("transport/driver-cars/add/", views.driver_car_create, name="driver_car_create"),
+    path("transport/waybills/add/", views.waybill_create, name="waybill_create"),
 ]
