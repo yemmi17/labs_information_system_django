@@ -12,7 +12,7 @@ from django.contrib.auth.models import Group, User
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from .models import Employee
+from .models import Employee, Material
 
 
 class EmployeeAccessTests(TestCase):
@@ -132,3 +132,24 @@ class EmployeeAccessTests(TestCase):
         user.groups.add(group)
         # Возвращаем пользователя вызывающему тесту для авторизации.
         return user
+
+
+class MaterialPrintReportTests(TestCase):
+    """Проверки печатной формы лабораторной №8."""
+
+    def test_print_report_contains_required_material_fields(self):
+        Material.objects.create(code="M-001", name="Бумага", accounting_account="10.01", quantity=120)
+
+        response = self.client.get(reverse("material_print_report"))
+
+        self.assertContains(response, "M-001")
+        self.assertContains(response, "Бумага")
+        self.assertContains(response, "10.01")
+        self.assertContains(response, "quantity-above")
+
+    def test_material_quantity_state_marks_thresholds(self):
+        below = Material(code="M-002", name="Скрепки", accounting_account="10.06", quantity=5)
+        multiple = Material(code="M-003", name="Папки", accounting_account="10.06", quantity=25)
+
+        self.assertEqual(below.quantity_state, "below")
+        self.assertEqual(multiple.quantity_state, "multiple")

@@ -247,6 +247,56 @@ th {
     font-weight: 700;
 }
 
+.quantity-above {
+    background: #fde8e8;
+}
+
+.quantity-below {
+    background: #e8f1fd;
+}
+
+.quantity-normal {
+    background: #edf7ed;
+}
+
+.quantity-multiple {
+    background: #fff7df;
+}
+
+.print-header {
+    text-align: center;
+    margin: 1rem 0 1.5rem;
+}
+
+.print-table th,
+.print-table td {
+    border: 1px solid var(--line);
+}
+
+@media print {
+    body {
+        background: #fff;
+    }
+
+    .site-header,
+    .no-print,
+    .messages {
+        display: none;
+    }
+
+    .page-shell {
+        padding: 0;
+    }
+
+    .panel,
+    .print-sheet {
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+    }
+}
+
 /* Адаптация макета под планшеты и телефоны. */
 @media (max-width: 900px) {
     /* Hero перестраивается в одну колонку. */

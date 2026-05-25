@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Материалы{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <p class="eyebrow">Лабораторная работа №8</p>
+            <h2>Справочник материалов</h2>
+            <p>Источник данных для печатной формы с условным форматированием.</p>
+        </div>
+        <div class="actions">
+            <a class="ghost-button" href="{% url 'material_print_report' %}">Печатная форма</a>
+            <a class="primary-button" href="{% url 'material_create' %}">Добавить материал</a>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Код</th>
+                    <th>Наименование</th>
+                    <th>Счет учета</th>
+                    <th>Количество</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in materials %}
+                    <tr class="quantity-{{ material.quantity_state }}">
+                        <td>{{ material.code }}</td>
+                        <td>{{ material.name }}</td>
+                        <td>{{ material.accounting_account }}</td>
+                        <td>{{ material.quantity }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">Материалы пока не добавлены.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -73,3 +73,30 @@ class Employee(models.Model):
         """
         # Используем reverse(), чтобы не хардкодить URL и сохранить связность с URLconf.
         return reverse("employee_list")
+
+
+class Material(models.Model):
+    """Материал для лабораторной работы №8 и печатной формы справочника."""
+
+    code = models.CharField("Код", max_length=20, unique=True)
+    name = models.CharField("Наименование", max_length=200)
+    accounting_account = models.CharField("Счет учета", max_length=20)
+    quantity = models.PositiveIntegerField("Количество", default=0)
+
+    class Meta:
+        ordering = ("code",)
+        verbose_name = "Материал"
+        verbose_name_plural = "Материалы"
+
+    def __str__(self):
+        return f"{self.code} - {self.name}"
+
+    @property
+    def quantity_state(self):
+        if self.quantity > 100:
+            return "above"
+        if self.quantity < 10:
+            return "below"
+        if self.quantity % 5 == 0:
+            return "multiple"
+        return "normal"

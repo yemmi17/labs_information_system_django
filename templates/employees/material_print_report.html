@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Печатная форма материалов{% endblock %}
+
+{% block content %}
+<section class="panel print-sheet">
+    <div class="panel-header no-print">
+        <div>
+            <p class="eyebrow">Печатная форма</p>
+            <h2>Справочник "Материалы"</h2>
+            <p>Пороги: ниже {{ lower_threshold }}, выше {{ upper_threshold }}, кратно {{ multiple_value }}.</p>
+        </div>
+        <button type="button" class="primary-button" onclick="window.print()">Печать</button>
+    </div>
+
+    <div class="print-header">
+        <h2>Печатная форма справочника "Материалы"</h2>
+        <p>Поля отчета: код, наименование, счет учета.</p>
+    </div>
+
+    <table class="print-table">
+        <thead>
+            <tr>
+                <th>Код</th>
+                <th>Наименование</th>
+                <th>Счет учета</th>
+                <th>Количество</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for material in materials %}
+                <tr class="quantity-{{ material.quantity_state }}">
+                    <td>{{ material.code }}</td>
+                    <td>{{ material.name }}</td>
+                    <td>{{ material.accounting_account }}</td>
+                    <td>{{ material.quantity }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">Нет данных для печати.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

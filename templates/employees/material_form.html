@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="panel narrow">
+    <p class="eyebrow">Лабораторная работа №8</p>
+    <h2>{{ title }}</h2>
+    <form method="post" class="employee-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="actions">
+            <button type="submit" class="primary-button">Сохранить</button>
+            <a class="ghost-button" href="{% url 'material_list' %}">Отмена</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

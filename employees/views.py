@@ -15,8 +15,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import EmployeeForm
-from .models import Employee
+from .forms import EmployeeForm, MaterialForm
+from .models import Employee, Material
 
 
 def home(request):
@@ -164,6 +164,33 @@ def employee_delete(request, pk):
 
     # Для GET показываем страницу подтверждения удаления.
     return render(request, "employees/employee_confirm_delete.html", {"employee": employee})
+
+
+def material_list(request):
+    """Отображает справочник материалов для лабораторной №8."""
+    return render(request, "employees/material_list.html", {"materials": Material.objects.all()})
+
+
+def material_create(request):
+    """Создает новую запись материала."""
+    form = MaterialForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Материал добавлен.")
+        return redirect("material_list")
+    return render(request, "employees/material_form.html", {"form": form, "title": "Добавить материал"})
+
+
+def material_print_report(request):
+    """Формирует HTML-печатную форму справочника материалов."""
+    materials = Material.objects.all()
+    context = {
+        "materials": materials,
+        "lower_threshold": 10,
+        "upper_threshold": 100,
+        "multiple_value": 5,
+    }
+    return render(request, "employees/material_print_report.html", context)
 
 
 # ===== Функции проверки прав доступа =====

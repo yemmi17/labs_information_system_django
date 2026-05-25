@@ -10,7 +10,7 @@
 
 from django import forms
 
-from .models import Employee
+from .models import Employee, Material
 
 
 class EmployeeForm(forms.ModelForm):
@@ -38,3 +38,11 @@ class EmployeeForm(forms.ModelForm):
             "work_phone",
             "personal_phone",
         ]
+
+
+class MaterialForm(forms.ModelForm):
+    """Форма заполнения справочника материалов для печатного отчета."""
+
+    class Meta:
+        model = Material
+        fields = ["code", "name", "accounting_account", "quantity"]
