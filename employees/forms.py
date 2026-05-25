@@ -10,7 +10,7 @@
 
 from django import forms
 
-from .models import Employee
+from .models import Counterparty, Employee
 
 
 class EmployeeForm(forms.ModelForm):
@@ -38,3 +38,19 @@ class EmployeeForm(forms.ModelForm):
             "work_phone",
             "personal_phone",
         ]
+
+
+class CounterpartyForm(forms.ModelForm):
+    """Форма карточки контрагента с серверной проверкой ИНН."""
+
+    class Meta:
+        model = Counterparty
+        fields = ["name", "code", "inn", "marked_for_deletion", "duplicate_note"]
+
+    def clean_inn(self):
+        inn = self.cleaned_data["inn"].strip()
+        if not inn:
+            raise forms.ValidationError("ИНН должен быть заполнен.")
+        if not inn.isdigit() or len(inn) not in (10, 12):
+            raise forms.ValidationError("ИНН должен содержать 10 или 12 цифр.")
+        return inn

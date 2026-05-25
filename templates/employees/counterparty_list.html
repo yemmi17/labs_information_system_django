@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Контрагенты{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <p class="eyebrow">Лабораторная работа №7</p>
+            <h2>Справочник контрагентов</h2>
+            <p>Проверка непустого ИНН, поиск дублей и пометка повторных записей на удаление.</p>
+        </div>
+        <div class="actions">
+            <a class="ghost-button" href="{% url 'counterparty_mark_duplicates' %}">Пометить дубли</a>
+            <a class="primary-button" href="{% url 'counterparty_create' %}">Добавить контрагента</a>
+        </div>
+    </div>
+
+    {% if duplicate_groups %}
+        <div class="notice warning">
+            Найдены повторяющиеся ИНН:
+            {% for group in duplicate_groups %}
+                <strong>{{ group.inn }}</strong> ({{ group.count }}){% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Код</th>
+                    <th>Наименование</th>
+                    <th>ИНН</th>
+                    <th>Статус</th>
+                    <th>Комментарий</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in counterparties %}
+                    <tr class="{% if item.marked_for_deletion %}muted-row{% endif %}">
+                        <td>{{ item.code }}</td>
+                        <td>{{ item.name }}</td>
+                        <td class="{% if not item.is_inn_valid %}danger-text{% endif %}">{{ item.inn }}</td>
+                        <td>
+                            {% if item.marked_for_deletion %}
+                                Помечен на удаление
+                            {% else %}
+                                Активен
+                            {% endif %}
+                        </td>
+                        <td>{{ item.duplicate_note|default:"-" }}</td>
+                        <td class="actions-cell">
+                            <a class="inline-link" href="{% url 'counterparty_check_inn' item.pk %}">Проверить ИНН</a>
+                            <a class="inline-link" href="{% url 'counterparty_update' item.pk %}">Изменить</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">Контрагенты пока не добавлены.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

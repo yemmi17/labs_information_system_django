@@ -12,11 +12,12 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.db import models
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import EmployeeForm
-from .models import Employee
+from .forms import CounterpartyForm, EmployeeForm
+from .models import Counterparty, Employee
 
 
 def home(request):
@@ -164,6 +165,91 @@ def employee_delete(request, pk):
 
     # Для GET показываем страницу подтверждения удаления.
     return render(request, "employees/employee_confirm_delete.html", {"employee": employee})
+
+
+def counterparty_list(request):
+    """Отображает справочник контрагентов и результаты проверки ИНН."""
+    duplicate_groups = find_duplicate_inn_groups()
+    context = {
+        "counterparties": Counterparty.objects.all(),
+        "duplicate_groups": duplicate_groups,
+    }
+    return render(request, "employees/counterparty_list.html", context)
+
+
+def counterparty_create(request):
+    """Создает новую карточку контрагента."""
+    form = CounterpartyForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Контрагент добавлен.")
+        return redirect("counterparty_list")
+    return render(request, "employees/counterparty_form.html", {"form": form, "title": "Добавить контрагента"})
+
+
+def counterparty_update(request, pk):
+    """Редактирует карточку контрагента."""
+    counterparty = get_object_or_404(Counterparty, pk=pk)
+    form = CounterpartyForm(request.POST or None, instance=counterparty)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Контрагент обновлен.")
+        return redirect("counterparty_list")
+    return render(
+        request,
+        "employees/counterparty_form.html",
+        {"form": form, "title": "Редактировать контрагента", "counterparty": counterparty},
+    )
+
+
+def counterparty_check_inn(request, pk):
+    """Проверяет выбранный ИНН на совпадения и подстрочные вхождения."""
+    counterparty = get_object_or_404(Counterparty, pk=pk)
+    candidates = Counterparty.objects.exclude(pk=counterparty.pk)
+    matches = [
+        item
+        for item in candidates
+        if item.inn == counterparty.inn or item.inn in counterparty.inn or counterparty.inn in item.inn
+    ]
+
+    if not counterparty.is_inn_valid:
+        messages.error(request, f"У контрагента {counterparty.name} некорректный ИНН.")
+    elif matches:
+        names = ", ".join(f"{item.name} [{item.code}]" for item in matches)
+        messages.warning(request, f"Найдены совпадения ИНН для {counterparty.name}: {names}.")
+    else:
+        messages.success(request, f"ИНН {counterparty.inn} для {counterparty.name} уникален.")
+
+    return redirect("counterparty_list")
+
+
+def counterparty_mark_duplicates(request):
+    """Помечает дублирующиеся ИНН на удаление, оставляя первую запись активной."""
+    marked_count = 0
+    for group in find_duplicate_inn_groups():
+        duplicates = list(Counterparty.objects.filter(inn=group["inn"]).order_by("pk"))
+        for duplicate in duplicates[1:]:
+            duplicate.marked_for_deletion = True
+            duplicate.duplicate_note = f"Дубликат ИНН {group['inn']}; основной код {duplicates[0].code}"
+            duplicate.save(update_fields=["marked_for_deletion", "duplicate_note", "updated_at"])
+            marked_count += 1
+
+    if marked_count:
+        messages.warning(request, f"Помечено на удаление дублей: {marked_count}.")
+    else:
+        messages.success(request, "Дубли ИНН не найдены.")
+    return redirect("counterparty_list")
+
+
+def find_duplicate_inn_groups():
+    """Возвращает группы ИНН, встречающиеся более одного раза."""
+    duplicates = (
+        Counterparty.objects.values("inn")
+        .order_by("inn")
+        .annotate(count=models.Count("id"))
+        .filter(count__gt=1)
+    )
+    return list(duplicates)
 
 
 # ===== Функции проверки прав доступа =====

@@ -30,4 +30,9 @@ urlpatterns = [
     path("employees/<int:pk>/edit/", views.employee_update, name="employee_update"),
     # Удаление сотрудника по первичному ключу pk после подтверждения.
     path("employees/<int:pk>/delete/", views.employee_delete, name="employee_delete"),
+    path("counterparties/", views.counterparty_list, name="counterparty_list"),
+    path("counterparties/add/", views.counterparty_create, name="counterparty_create"),
+    path("counterparties/<int:pk>/edit/", views.counterparty_update, name="counterparty_update"),
+    path("counterparties/<int:pk>/check/", views.counterparty_check_inn, name="counterparty_check_inn"),
+    path("counterparties/mark-duplicates/", views.counterparty_mark_duplicates, name="counterparty_mark_duplicates"),
 ]

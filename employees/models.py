@@ -73,3 +73,32 @@ class Employee(models.Model):
         """
         # Используем reverse(), чтобы не хардкодить URL и сохранить связность с URLconf.
         return reverse("employee_list")
+
+
+class Counterparty(models.Model):
+    """Контрагент для лабораторной работы №7.
+
+    Модель имитирует справочник контрагентов из типовой конфигурации:
+    пользователь ведет карточки организаций и проверяет заполненность/дубли ИНН.
+    """
+
+    name = models.CharField("Наименование", max_length=200)
+    inn = models.CharField("ИНН", max_length=12)
+    code = models.CharField("Код", max_length=20, unique=True)
+    marked_for_deletion = models.BooleanField("Помечен на удаление", default=False)
+    duplicate_note = models.CharField("Комментарий проверки", max_length=255, blank=True)
+    created_at = models.DateTimeField("Создан", auto_now_add=True)
+    updated_at = models.DateTimeField("Изменен", auto_now=True)
+
+    class Meta:
+        ordering = ("name", "code")
+        verbose_name = "Контрагент"
+        verbose_name_plural = "Контрагенты"
+
+    def __str__(self):
+        return f"{self.name} ({self.inn})"
+
+    @property
+    def is_inn_valid(self):
+        """Возвращает True для непустого ИНН длиной 10 или 12 цифр."""
+        return self.inn.isdigit() and len(self.inn) in (10, 12)

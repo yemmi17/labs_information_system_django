@@ -12,7 +12,7 @@ from django.contrib.auth.models import Group, User
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from .models import Employee
+from .models import Counterparty, Employee
 
 
 class EmployeeAccessTests(TestCase):
@@ -132,3 +132,27 @@ class EmployeeAccessTests(TestCase):
         user.groups.add(group)
         # Возвращаем пользователя вызывающему тесту для авторизации.
         return user
+
+
+class CounterpartyInnTests(TestCase):
+    """Проверки лабораторной №7: валидация ИНН и пометка дублей."""
+
+    def test_invalid_inn_is_rejected_by_form(self):
+        response = self.client.post(
+            reverse("counterparty_create"),
+            {"name": "ООО Ромашка", "code": "C-001", "inn": "abc"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "ИНН должен содержать 10 или 12 цифр.")
+
+    def test_duplicate_inn_can_be_marked_for_deletion(self):
+        Counterparty.objects.create(name="ООО Альфа", code="C-001", inn="7701234567")
+        duplicate = Counterparty.objects.create(name="ООО Альфа дубль", code="C-002", inn="7701234567")
+
+        response = self.client.get(reverse("counterparty_mark_duplicates"))
+
+        duplicate.refresh_from_db()
+        self.assertRedirects(response, reverse("counterparty_list"))
+        self.assertTrue(duplicate.marked_for_deletion)
+        self.assertIn("Дубликат ИНН", duplicate.duplicate_note)

@@ -237,6 +237,34 @@ th {
     border-radius: 14px;
 }
 
+.message.warning,
+.notice.warning {
+    background: #fff7df;
+    border-color: #e5c15f;
+}
+
+.message.error {
+    background: #fde8e8;
+    border-color: #e0a0a0;
+}
+
+.notice {
+    margin: 1rem 0;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+}
+
+.muted-row {
+    color: var(--muted);
+    background: #f3eee8;
+}
+
+.danger-text {
+    color: #8b1e1e;
+    font-weight: 700;
+}
+
 /* Чип текущей роли/пользователя в шапке. */
 .role-chip {
     display: inline-flex;
