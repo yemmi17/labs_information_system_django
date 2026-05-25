@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Мини-CASE система{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <p class="eyebrow">Лабораторная работа №11</p>
+            <h2>Мини-CASE система математической модели</h2>
+            <p>Соберите цепочку функций, проверьте расчет и сгенерируйте VBA-код.</p>
+        </div>
+    </div>
+
+    <div class="case-grid">
+        <form method="post" class="employee-form case-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="primary-button">Сгенерировать</button>
+        </form>
+
+        <div class="card">
+            <h3>Результат</h3>
+            {% if expression %}
+                <p><strong>{{ expression }}</strong></p>
+                {% if result.ok %}
+                    <p class="success-text">Значение: {{ result.value|floatformat:6 }}</p>
+                {% else %}
+                    <p class="danger-text">Шаг {{ result.step }}: {{ result.error }}</p>
+                {% endif %}
+                <h3>VBA-код</h3>
+                <pre class="code-block">{{ vba_code }}</pre>
+            {% else %}
+                <p>Выберите функции и нажмите кнопку генерации.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

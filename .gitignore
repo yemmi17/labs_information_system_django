@@ -1,35 +1,5 @@
-# Общие Python / Django файлы
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-*.sqlite3
 db.sqlite3
-
-# Логи
-*.log
-
-# Виртуальные окружения
-venv/
 .venv/
-env/
-.env/
 .env
-
-# Кэш и временные файлы
-*.pid
-*.DS_Store
-*.swp
-*.swo
-.idea/
-.vscode/
-
-# Статика / медиа (если будут вынесены отдельно)
-staticfiles/
-media/
-
-# Системные файлы Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-

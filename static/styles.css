@@ -1,0 +1,303 @@
+﻿:root {
+    /* Цвет фона страницы. */
+    --bg: #f6f0e8;
+    /* Цвет поверхностей панелей. */
+    --panel: #fffaf4;
+    /* Основной цвет текста. */
+    --ink: #1f2933;
+    /* Вторичный цвет текста. */
+    --muted: #5b6470;
+    /* Акцентный цвет кнопок и ссылок. */
+    --accent: #8c3f2b;
+    /* Темный вариант акцентного цвета для hover-состояний. */
+    --accent-dark: #6d2f1f;
+    /* Цвет границ элементов интерфейса. */
+    --line: #d6c6b5;
+    /* Цвет успешных сообщений. */
+    --success: #ecf7ee;
+}
+
+/* Универсальная модель размеров предотвращает неожиданный рост блоков от padding. */
+* {
+    box-sizing: border-box;
+}
+
+/* Базовые настройки страницы и общего фона интерфейса. */
+body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at top left, rgba(196, 149, 106, 0.25), transparent 28%),
+        linear-gradient(180deg, #f3eadf 0%, #fbf7f2 100%);
+}
+
+/* Ссылки наследуют цвет родителя, чтобы стили задавались через классы. */
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Верхняя шапка приложения с названием и навигацией. */
+.site-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(109, 47, 31, 0.15);
+}
+
+/* Горизонтальная навигация в шапке. */
+.site-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Внутренний отступ основной области страниц. */
+.page-shell {
+    padding: 2rem;
+}
+
+/* Общие декоративные свойства крупных панелей интерфейса. */
+.hero,
+.panel {
+    background: rgba(255, 250, 244, 0.95);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    box-shadow: 0 14px 30px rgba(77, 48, 34, 0.08);
+}
+
+/* Главный экран приложения с описанием и демо-доступами. */
+.hero {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    padding: 2rem;
+}
+
+/* Основная панель контента внутренних страниц. */
+.panel {
+    padding: 1.5rem;
+}
+
+/* Узкий вариант панели для форм и подтверждений. */
+.panel.narrow {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+/* Размер заголовков внутри hero и panel. */
+.hero-copy h2,
+.panel h2 {
+    margin-top: 0.2rem;
+    font-size: 2rem;
+}
+
+/* Маленький акцентный заголовок над основным текстом. */
+.eyebrow {
+    margin: 0;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+/* Карточка используется для отдельного вспомогательного блока. */
+.card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 1.25rem;
+}
+
+/* Список демонстрационных учетных записей. */
+.credential-list {
+    padding-left: 1.2rem;
+    color: var(--muted);
+}
+
+/* Контейнеры действий выравнивают кнопки и заголовочные элементы. */
+.actions,
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Общие свойства кнопок и ссылок-кнопок. */
+.primary-button,
+.ghost-button,
+.danger-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 0.75rem 1.2rem;
+    font-weight: 700;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+/* Основная кнопка действия. */
+.primary-button {
+    background: var(--accent);
+    color: #fff;
+}
+
+/* Hover-состояние основной кнопки. */
+.primary-button:hover {
+    background: var(--accent-dark);
+}
+
+/* Вторичная кнопка без заливки. */
+.ghost-button {
+    background: transparent;
+    border-color: var(--line);
+}
+
+/* Опасные действия выделяются цветом ошибки. */
+.danger-button,
+.danger-link {
+    color: #8b1e1e;
+}
+
+/* Горизонтальная прокрутка защищает таблицу на узких экранах. */
+.table-wrap {
+    overflow-x: auto;
+}
+
+/* Базовая таблица сотрудников. */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+/* Общие ячейки таблицы. */
+th,
+td {
+    padding: 0.9rem;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+}
+
+/* Заголовки таблицы отличаются приглушенным цветом. */
+th {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+/* Ячейка действий не переносит ссылки на несколько строк без необходимости. */
+.actions-cell {
+    white-space: nowrap;
+}
+
+/* Ссылки действий внутри таблицы. */
+.inline-link {
+    margin-right: 0.75rem;
+    color: var(--accent);
+    font-weight: 700;
+}
+
+/* Поля формы расположены вертикально для удобного заполнения. */
+.employee-form p {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 1rem;
+}
+
+/* Единый вид текстовых input внутри формы сотрудника. */
+.employee-form input {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    font: inherit;
+    background: #fff;
+}
+
+/* Список flash-сообщений Django без стандартных маркеров. */
+.messages {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+}
+
+/* Отдельное сообщение об успешной операции. */
+.message {
+    background: var(--success);
+    border: 1px solid #b7d9bd;
+    padding: 0.9rem 1rem;
+    border-radius: 14px;
+}
+
+/* Чип текущей роли/пользователя в шапке. */
+.role-chip {
+    display: inline-flex;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    background: #efe1d3;
+    color: var(--accent-dark);
+    font-weight: 700;
+}
+
+.danger-text {
+    color: #8b1e1e;
+    font-weight: 700;
+}
+
+.success-text {
+    color: #2f7d32;
+    font-weight: 700;
+}
+
+.case-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.8fr) minmax(320px, 1.2fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+.case-form ul {
+    list-style: none;
+    padding: 0;
+}
+
+.code-block {
+    overflow-x: auto;
+    padding: 1rem;
+    border-radius: 12px;
+    background: #1f2933;
+    color: #f8fafc;
+    line-height: 1.5;
+}
+
+/* Адаптация макета под планшеты и телефоны. */
+@media (max-width: 900px) {
+    /* Hero перестраивается в одну колонку. */
+    .hero {
+        grid-template-columns: 1fr;
+    }
+
+    /* Шапка и навигация становятся вертикальными. */
+    .site-header,
+    .site-nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* Уменьшаем отступы основной области на малых экранах. */
+    .page-shell {
+        padding: 1rem;
+    }
+
+    .case-grid {
+        grid-template-columns: 1fr;
+    }
+}

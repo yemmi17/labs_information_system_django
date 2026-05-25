@@ -1,0 +1,19 @@
+﻿{% extends "base.html" %}
+{# Шаблон подтверждения удаления сотрудника. #}
+
+{% block title %}Удаление сотрудника{% endblock %}
+
+{% block content %}
+<!-- Удаление подтверждается отдельной POST-формой, чтобы GET-запрос не менял данные. -->
+<section class="panel narrow">
+    <p class="eyebrow">Подтверждение удаления</p>
+    <h2>Удалить сотрудника {{ employee }}?</h2>
+    <p>Это действие доступно только директору.</p>
+    <!-- CSRF-защита обязательна для операции удаления. -->
+    <form method="post" class="actions">
+        {% csrf_token %}
+        <button type="submit" class="danger-button">Удалить</button>
+        <a class="ghost-button" href="{% url 'employee_list' %}">Отмена</a>
+    </form>
+</section>
+{% endblock %}
